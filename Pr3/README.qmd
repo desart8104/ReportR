@@ -1,0 +1,191 @@
+---
+format:
+  md:
+    output-file: "README.md"
+editor: "visual"
+---
+
+# Практика № 3
+
+Основы обработки данных с помощью R и Dplyr
+
+## Цель работы
+
+1.  Развить практические навыки использования языка программирования R для обработки данных
+
+2.  Закрепить знания основных функций обработки данных
+
+3.  Развить практические навыки использования функций обработки данных пакета dplyr - функции select(), filter(), mutate(), arrange(), group_by()
+
+## Исходные данные
+
+1.  ОС Windows
+2.  Ноутбук
+3.  Пакет nycflights13
+4.  RStudio
+
+## План выполнения работы
+
+1.  Загрузить в память данные пакета
+
+2.  Произвести анализ данных, которые находятся в пакете nycflights13, с использованием функций языка R
+
+3.  Создать отчет
+
+## Содержание практической работы
+
+### Шаг 1. Скачать пакеть nycflights13
+
+**На данном шаге производится получение исходных данных**
+
+```{r}
+#install.packages("nycflights13")
+```
+
+Подключение библиотеки с данными
+
+```{r}
+library(nycflights13)
+```
+
+Подключение библиотеки для обработки dplyr
+
+```{r}
+library(dplyr)
+```
+
+### Шаг 2. Анализ данных. Выполнение заданий
+
+#### Сколько встроенных в пакет nycflights13 датафреймов?
+
+```{r}
+data(package="nycflights13")
+```
+
+#### Сколько строк в каждом датафрейме
+
+```{r}
+airports %>% nrow()
+```
+
+```{r}
+flights %>% nrow()
+```
+
+```{r}
+planes %>% nrow()
+```
+
+```{r}
+airlines %>% nrow()
+```
+
+```{r}
+weather %>% nrow()
+```
+
+#### Сколько столбцов в каждом датафрейме
+
+```{r}
+airlines %>% ncol()
+```
+
+```{r}
+airports %>% ncol()
+```
+
+```{r}
+flights %>% ncol()
+```
+
+```{r}
+planes %>% ncol()
+```
+
+```{r}
+weather %>% ncol()
+```
+
+#### Как посмотреть примерный вид датафрейма?
+
+```{r}
+airlines %>% glimpse()
+```
+
+```{r}
+airports %>% glimpse()
+```
+
+```{r}
+flights %>% glimpse()
+```
+
+```{r}
+planes %>% glimpse()
+```
+
+```{r}
+weather %>% glimpse()
+```
+
+#### Сколько компаний-перевозчиков (carrier) учитывают эти наборы данных (представлено в наборах данных)?
+
+```{r}
+flights %>% group_by(carrier) %>% summarise() %>% nrow()
+```
+
+#### Сколько рейсов принял аэропорт John F Kennedy Intl в мае?
+
+```{r}
+flights %>% filter(origin == 'JFK') %>% filter(month == 5) %>% nrow()
+```
+
+#### Какой самый северный аэропорт?
+
+```{r}
+airports %>% arrange(desc(lat)) %>% head(1) %>% select(name)
+```
+
+#### Какой аэропорт самый высокогорный (находится выше всех над уровнем моря?)
+
+```{r}
+airports %>% arrange(desc(alt)) %>% head(1) %>% select(name)
+```
+
+#### Какие бортовые номера у самых старых самолетов?
+
+```{r}
+planes %>% filter(!is.na(year)) %>% arrange(year) %>% select(tailnum) %>% head(10)
+```
+
+#### Какая средняя температура воздуха была в сентябре в аэропорту John F Kennedy Intl (в градусах цельсия)
+
+```{r}
+tempFar <- weather %>%  filter(!is.na(temp)) %>% filter(origin == 'JFK') %>% filter(month == 9) %>% summarise(mean(temp))
+tempCel <- (5/9) * (tempFar - 32)
+tempCel
+```
+
+#### Самолеты какой авиакомпании совершили больше всего вылетов в июне?
+
+```{r}
+abbr <- flights %>% filter(!is.na(carrier)) %>% filter(!is.na(month)) %>% filter(month == 6) %>% group_by(carrier) %>% summarise("Count"=n()) %>% arrange(desc(Count)) %>% select(carrier) %>% head(1)
+companyName <- airlines %>% filter(carrier == abbr$carrier) %>% select(name)
+companyName
+```
+
+#### Самолеты какой авиакомпании задержались чаще других в 2013 году?
+
+```{r}
+abbr <- flights %>% filter(!is.na(dep_delay)) %>% filter(!is.na(arr_delay)) %>% filter(year == 2013) %>% filter(arr_delay > 0) %>% group_by(carrier) %>% summarise("Count"=sum(arr_delay)) %>% arrange(desc(Count)) %>% head(1) %>% select(carrier)
+companyName <- airlines %>% filter(carrier == abbr$carrier) %>% select(name)
+companyName
+```
+
+## Оценка результатов
+
+Были получены практические навыки использования языка R для обработки и анализа данных.
+
+## Вывод
+
+В результате выполнения данной практической работы были закреплены знания основных функций обработки данных и получены практические навыки использования функций обработки данных пакета dplyr - функции select(), filter(), mutate(), arrange(), group_by()
